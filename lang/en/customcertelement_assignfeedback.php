@@ -55,6 +55,11 @@ $string['feedbacknotavailable'] = 'Feedback not available';
 // any feedback comment (commenttext is empty), or when the assignment uses a
 // different feedback sub-plugin (Annotate PDF, File feedback etc.).
 $string['nofeedbackprovided'] = 'No feedback provided';
+$string['charlimit'] = 'Character limit';
+$string['charlimit_help'] = 'Enter the maximum number of characters (including spaces) to display on the certificate. Use 0 for no limit. Defaults to 1000.';
+$string['assignid'] = 'Assignment';
+$string['assignid_help'] = 'Select the assignment from which to retrieve feedback comments.';
+$string['readmoreonline'] = 'Read more online';
 
 // Privacy API strings.
 $string['privacy:metadata:assign_grades']

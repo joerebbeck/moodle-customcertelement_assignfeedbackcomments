@@ -25,13 +25,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'customcertelement_assignfeedback';
-$plugin->version   = 2026031800; // Bumped to today's date
+$plugin->version   = 2026031900;
 $plugin->requires  = 2022112800; // Updated to Moodle 4.1+ per README
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.1'; // Increment release for update
+$plugin->maturity  = MATURITY_BETA;
+$plugin->release   = '1.1.0';
 
 // Declare explicit dependencies for robust installation checks
-$plugin->dependencies = array(
+$plugin->dependencies = [
     'mod_customcert' => 2022112800, // Matching Moodle 4.1 timeframe
     'mod_assign'     => 2022112800,
-);
+];

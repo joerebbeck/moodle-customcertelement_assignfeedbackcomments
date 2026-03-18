@@ -1,0 +1,82 @@
+name: Moodle Plugin CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.1']
+        moodle: ['MOODLE_401_STABLE', 'MOODLE_403_STABLE']
+        database: ['mysqli', 'pgsql']
+        exclude:
+          # PHP 7.4 is not supported on Moodle 4.3+
+          - php: '7.4'
+            moodle: 'MOODLE_403_STABLE'
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 'moodle'
+          POSTGRES_DB: moodle
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      mysql:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: 'moodle'
+          MYSQL_DATABASE: moodle
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: plugin
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, gd, xml, intl, mysqli, pgsql
+          coverage: none
+
+      - name: Install moodle-plugin-ci
+        run: |
+          composer global require moodlehq/moodle-plugin-ci:^3.4
+          echo "$HOME/.composer/vendor/bin" >> $GITHUB_PATH
+
+      - name: Initialize Moodle
+        run: |
+          DBUSER="root"
+          if [ "${{ matrix.database }}" = "pgsql" ]; then DBUSER="postgres"; fi
+          moodle-plugin-ci install --plugin plugin --repo git://github.com/moodle/moodle.git --branch ${{ matrix.moodle }} --dbtype ${{ matrix.database }} --dbuser $DBUSER --dbpass 'moodle' --dbname moodle --dbhost 127.0.0.1
+
+      - name: PHP Lint
+        run: moodle-plugin-ci php-lint
+
+      - name: PHPCS (Coding Style)
+        run: moodle-plugin-ci phpcs
+
+      - name: PHPUnit Tests
+        run: moodle-plugin-ci phpunit
+
+      - name: Behat Tests
+        run: moodle-plugin-ci behat

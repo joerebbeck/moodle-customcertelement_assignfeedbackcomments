@@ -52,6 +52,13 @@ abstract class element_base extends \mod_customcert\element {
 
         $mform->addElement('select', 'assignid', get_string('assignment', 'customcertelement_assignfeedback'), $options);
         $mform->setType('assignid', PARAM_INT);
+        $mform->addHelpButton('assignid', 'assignid', 'customcertelement_assignfeedback');
+
+        // Character limit setting
+        $mform->addElement('text', 'char_limit', get_string('charlimit', 'customcertelement_assignfeedback'));
+        $mform->setType('char_limit', PARAM_INT);
+        $mform->setDefault('char_limit', 1000);
+        $mform->addHelpButton('char_limit', 'charlimit', 'customcertelement_assignfeedback');
 
         // Coupling notice: inform instructors of the feedback sub-plugin limitation
         $mform->addElement('static', 'assignfeedback_notice', '',
@@ -87,6 +94,7 @@ abstract class element_base extends \mod_customcert\element {
     public function normalise_data(\stdClass $formdata): array {
         return [
             'assignid' => (int) ($formdata->assignid ?? 0),
+            'char_limit' => !empty($formdata->char_limit) ? (int) $formdata->char_limit : 0,
         ];
     }
 
@@ -99,8 +107,13 @@ abstract class element_base extends \mod_customcert\element {
         // Use v2 get_payload() if available, otherwise fallback handles decoding
         if (method_exists($this, 'get_payload')) {
             $payload = $this->get_payload();
-            if (is_array($payload) && array_key_exists('assignid', $payload)) {
-                $mform->setDefault('assignid', $payload['assignid']);
+            if (is_array($payload)) {
+                if (array_key_exists('assignid', $payload)) {
+                    $mform->setDefault('assignid', $payload['assignid']);
+                }
+                if (array_key_exists('char_limit', $payload)) {
+                    $mform->setDefault('char_limit', $payload['char_limit']);
+                }
             }
         }
     }
@@ -132,31 +145,50 @@ abstract class element_base extends \mod_customcert\element {
     }
 
     /**
-     * Saves the form data for this element (legacy API).
+     * Handles saving the unique data for this element into the database.
      *
-     * @param \stdClass $data The form data.
+     * @param \stdClass $data the form data
+     * @return string the unique data to save
      */
-    public function save_form_elements($data) {
-        $this->set_data(json_encode(['assignid' => (int) $data->assignid]));
-        parent::save_form_elements($data);
+    public function save_unique_data($data) {
+        return json_encode([
+            'assignid' => (int) ($data->assignid ?? 0),
+            'char_limit' => !empty($data->char_limit) ? (int) $data->char_limit : 0,
+        ]);
     }
 
     /**
-     * Populates the form with the saved element data (legacy API).
+     * Sets the data on the form when editing an element (legacy API).
      *
-     * @param \MoodleQuickForm $mform The form being rendered.
+     * @param \mod_customcert\edit_element_form $mform the edit_form instance
      */
-    public function set_form_elements_data($mform) {
+    public function definition_after_data($mform) {
         $data = json_decode($this->get_data(), true);
         if (!empty($data['assignid'])) {
-            $mform->setDefault('assignid', $data['assignid']);
+            if ($mform->elementExists('assignid')) {
+                $mform->getElement('assignid')->setValue($data['assignid']);
+            }
         }
-        parent::set_form_elements_data($mform);
+        if (!empty($data['char_limit'])) {
+            if ($mform->elementExists('char_limit')) {
+                $mform->getElement('char_limit')->setValue($data['char_limit']);
+            }
+        }
+        parent::definition_after_data($mform);
     }
 
     // =========================================================================
     // Render / preview
     // =========================================================================
+
+    /**
+     * Renders this element as an HTML string for preview.
+     *
+     * @return string
+     */
+    public function render_html() {
+        return $this->preview_text();
+    }
 
     /**
      * Returns a sample string for the PDF preview.
@@ -175,10 +207,9 @@ abstract class element_base extends \mod_customcert\element {
      * @param \pdf      $pdf     The PDF object.
      * @param bool      $preview Whether this is a preview render.
      * @param \stdClass $user    The user the certificate is being generated for.
-     * @param \stdClass $record  The customcert issue record.
      */
-    public function render($pdf, $preview, $user, $record) {
-        $context = \context_module::instance($this->get_cmid());
+    public function render($pdf, $preview, $user) {
+        $context = \mod_customcert\element_helper::get_context($this->get_id());
         require_capability('mod/customcert:view', $context);
 
         if ($preview) {
@@ -188,8 +219,9 @@ abstract class element_base extends \mod_customcert\element {
 
         $elementdata = json_decode($this->get_data(), true);
         $assignid    = (int) ($elementdata['assignid'] ?? 0);
+        $charlimit   = !empty($elementdata['char_limit']) ? (int) $elementdata['char_limit'] : 0;
 
-        $feedback = $this->get_feedback_for_user($assignid, $user->id);
+        $feedback = $this->get_feedback_for_user($assignid, $user->id, $charlimit);
 
         \mod_customcert\element_helper::render_content($pdf, $this, $feedback);
     }
@@ -207,12 +239,12 @@ abstract class element_base extends \mod_customcert\element {
      */
     protected function assignment_is_available(int $assignid): bool {
         $plugininfo = \core_plugin_manager::instance()->get_plugin_info('mod_assign');
-        if ($plugininfo === null || $plugininfo->is_uninstalled()) {
+        if ($plugininfo === null || !$plugininfo->is_enabled()) {
             return false;
         }
 
-        global $DB;
-        require_once($GLOBALS['CFG']->dirroot . '/mod/assign/locallib.php');
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
         return $DB->record_exists('assign', ['id' => $assignid]);
     }
@@ -221,10 +253,11 @@ abstract class element_base extends \mod_customcert\element {
      * Retrieves and PDF-safe-formats the grader's feedback for a user.
      *
      * @param int $assignid The assignment ID.
-     * @param int $userid   The target user ID.
+     * @param int $userid The target user ID.
+     * @param int $charlimit Optional character limit for feedback truncation.
      * @return string PDF-safe feedback string, or an appropriate placeholder.
      */
-    protected function get_feedback_for_user(int $assignid, int $userid): string {
+    protected function get_feedback_for_user(int $assignid, int $userid, int $charlimit = 0): string {
         global $DB;
 
         if (empty($assignid)) {
@@ -270,7 +303,7 @@ abstract class element_base extends \mod_customcert\element {
             return $result;
         }
 
-        $context   = \context_module::instance($this->get_cmid());
+        $context   = \mod_customcert\element_helper::get_context($this->get_id());
         $formatted = format_text($row->commenttext, $row->commentformat, [
             'context' => $context,
             'noclean' => false,
@@ -278,6 +311,21 @@ abstract class element_base extends \mod_customcert\element {
         ]);
 
         $result = $this->clean_for_pdf($formatted);
+
+        if ($charlimit > 0) {
+            $ending = '...';
+            if ($assignid > 0) {
+                $cm = get_coursemodule_from_instance('assign', $assignid);
+                if ($cm) {
+                    global $CFG;
+                    $url = $CFG->wwwroot . '/mod/assign/view.php?id=' . $cm->id;
+                    $readmore = get_string('readmoreonline', 'customcertelement_assignfeedback');
+                    $ending = '... <a href="' . $url . '">' . $readmore . '</a>';
+                }
+            }
+            $result = shorten_text($result, $charlimit, false, $ending);
+        }
+
         $cache->set($cachekey, $result);
 
         return $result;

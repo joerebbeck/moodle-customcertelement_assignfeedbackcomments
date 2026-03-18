@@ -74,7 +74,7 @@ class element_test extends \advanced_testcase {
     /**
      * Test that the fallback string is returned when no feedback comment exists.
      */
-    public function test_no_feedback_comments_returns_unavailable_string(): void {
+    public function test_no_feedback_comments_returns_no_feedback_provided_string(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -98,7 +98,7 @@ class element_test extends \advanced_testcase {
         $method->setAccessible(true);
 
         $result = $method->invoke($element, $assign->id, $student->id);
-        $this->assertEquals(get_string('feedbacknotavailable', 'customcertelement_assignfeedback'), $result);
+        $this->assertEquals(get_string('nofeedbackprovided', 'customcertelement_assignfeedback'), $result);
     }
 
     /**
@@ -151,9 +151,6 @@ class element_test extends \advanced_testcase {
         $this->assertSame('', $result);
     }
 
-    /**
-     * Test that HTML tags are stripped from feedback comments.
-     */
     /**
      * Tests that clean_for_pdf() strips dangerous tags that break TCPDF while
      * preserving safe inline formatting tags that TCPDF's writeHTMLCell() supports.
@@ -211,6 +208,56 @@ class element_test extends \advanced_testcase {
     }
 
     /**
+     * Test that feedback comment is truncated with a link when exceeding char limit.
+     */
+    public function test_get_feedback_for_user_truncates_over_limit(): void {
+        global $DB, $CFG;
+        $this->resetAfterTest();
+
+        $course  = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_user();
+        $assign  = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+
+        // Insert a grade record.
+        $gradeid = $DB->insert_record('assign_grades', [
+            'assignment' => $assign->id,
+            'userid'     => $student->id,
+            'timecreated'  => time(),
+            'timemodified' => time(),
+            'grader'     => 2,
+            'grade'      => 80.0,
+            'attemptnumber' => 0,
+        ]);
+
+        // Insert a LONG feedback comment.
+        $DB->insert_record('assignfeedback_comments', [
+            'assignment'  => $assign->id,
+            'grade'       => $gradeid,
+            'commenttext' => '<p>This is a lengthy feedback comment containing rich formatting that gets truncated safely.</p>',
+            'commentformat' => FORMAT_HTML,
+        ]);
+
+        $element = $this->get_test_element();
+        $method  = new \ReflectionMethod($element, 'get_feedback_for_user');
+        $method->setAccessible(true);
+
+        // Limit is set to 20. shorten_text should truncate word-boundary decently.
+        $result = $method->invoke($element, $assign->id, $student->id, 20);
+
+        // Verification:
+        // 1. It must contain the reading link.
+        $this->assertStringContainsString('<a href="', $result);
+        $this->assertStringContainsString('mod/assign/view.php?id=', $result);
+        
+        // 2. It must be truncated. The plain text content should be shorter than original.
+        $this->assertStringNotContainsString('safely', $result);
+        $this->assertStringContainsString('...', $result);
+        
+        // 3. HTML formatting (like <p>) should survive if it is before truncation.
+        $this->assertStringContainsString('<p>', $result);
+    }
+
+    /**
      * Helper: invoke the protected clean_for_pdf() method via reflection.
      *
      * @param \customcertelement_assignfeedback\element $element
@@ -224,5 +271,14 @@ class element_test extends \advanced_testcase {
         $ref    = new \ReflectionMethod($element, 'clean_for_pdf');
         $ref->setAccessible(true);
         return $ref->invoke($element, $html);
+    }
+
+    /**
+     * Helper: get a test element instance.
+     *
+     * @return \customcertelement_assignfeedback\element
+     */
+    private function get_test_element(): \customcertelement_assignfeedback\element {
+        return new element(new \stdClass());
     }
 }

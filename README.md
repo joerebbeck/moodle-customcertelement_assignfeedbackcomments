@@ -49,10 +49,17 @@ assignment: **Assignment › Edit settings › Feedback types**.
 
 ## Installation
 
-1. Copy this folder to `<moodleroot>/mod/customcert/element/assignfeedback/`
-2. Visit **Site administration › Notifications** to trigger the Moodle upgrade step
-3. The element will appear as **"Assignment Feedback Comments"** in the certificate
-   template editor
+### Method 1: Via Zip Upload (Recommended)
+1. Log in to your Moodle site as an administrator.
+2. Go to **Site administration › Plugins › Install plugins**.
+3. Upload the `.zip` file for this plugin.
+4. Follow the prompts to trigger the upgrade set.
+
+### Method 2: Manual (Developer Workflow)
+1. Copy or clone this folder into your Moodle installation's customcert element directory.
+2. Visit **Site administration › Notifications** to trigger the installation script.
+
+Once installed, the item will appear as **"Assignment Feedback Comments"** in the certificate template editor's element menu.
 
 ## License
 
