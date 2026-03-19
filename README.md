@@ -31,6 +31,18 @@ Upon adding the element to a cert template:
 1.  **Assignment ID**: Choose the target assignment mapping from the dropdown directory.
 2.  **Character Limit**: *(Optional)* Enter the maximum allowed characters. Type `0` to display full feedback length boundaries.
 
+---
+
+## 🖼️ Screenshots
+
+### Element Configuration
+![Configuration Settings](screenshots/screenshot_settings.png)
+
+### Certificate Output Preview
+![Certificate PDF View](screenshots/screenshot_certificate.png)
+
+---
+
 ## ⚠️ Limitations & Fallbacks
 
 This element reads **only** from the *Feedback comments* sub-plugin (`assignfeedback_comments`).
