@@ -21,12 +21,12 @@
  * but does NOT implement any interfaces directly to avoid Fatal Errors on older mod_customcert
  * versions.
  *
- * @package customcertelement_assignfeedback
+ * @package customcertelement_assignfeedbackcomments
  * @copyright 2026 Joe Rebbeck <tjr@the-ela.com>
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace customcertelement_assignfeedback;
+namespace customcertelement_assignfeedbackcomments;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,21 +48,21 @@ abstract class element_base extends \mod_customcert\element {
         global $COURSE;
 
         $assignments = $this->get_course_assignments($COURSE->id);
-        $options = [0 => get_string('chooseassignment', 'customcertelement_assignfeedback')] + $assignments;
+        $options = [0 => get_string('chooseassignment', 'customcertelement_assignfeedbackcomments')] + $assignments;
 
-        $mform->addElement('select', 'assignid', get_string('assignment', 'customcertelement_assignfeedback'), $options);
+        $mform->addElement('select', 'assignid', get_string('assignment', 'customcertelement_assignfeedbackcomments'), $options);
         $mform->setType('assignid', PARAM_INT);
-        $mform->addHelpButton('assignid', 'assignid', 'customcertelement_assignfeedback');
+        $mform->addHelpButton('assignid', 'assignid', 'customcertelement_assignfeedbackcomments');
 
         // Character limit setting
-        $mform->addElement('text', 'char_limit', get_string('charlimit', 'customcertelement_assignfeedback'));
+        $mform->addElement('text', 'char_limit', get_string('charlimit', 'customcertelement_assignfeedbackcomments'));
         $mform->setType('char_limit', PARAM_INT);
         $mform->setDefault('char_limit', 1000);
-        $mform->addHelpButton('char_limit', 'charlimit', 'customcertelement_assignfeedback');
+        $mform->addHelpButton('char_limit', 'charlimit', 'customcertelement_assignfeedbackcomments');
 
         // Coupling notice: inform instructors of the feedback sub-plugin limitation
         $mform->addElement('static', 'assignfeedback_notice', '',
-            get_string('feedbackcommentsonly', 'customcertelement_assignfeedback'));
+            get_string('feedbackcommentsonly', 'customcertelement_assignfeedbackcomments'));
 
         // Guard for v2: add common form elements if the required v2 standard is fully active
         if (interface_exists('\mod_customcert\element\form_buildable_interface') && 
@@ -196,7 +196,7 @@ abstract class element_base extends \mod_customcert\element {
      * @return string
      */
     public function preview_text() {
-        return get_string('pluginname', 'customcertelement_assignfeedback');
+        return get_string('pluginname', 'customcertelement_assignfeedbackcomments');
     }
 
     /**
@@ -264,7 +264,7 @@ abstract class element_base extends \mod_customcert\element {
             return '';
         }
 
-        $cache    = \cache::make('customcertelement_assignfeedback', 'feedbackcache');
+        $cache    = \cache::make('customcertelement_assignfeedbackcomments', 'feedbackcache');
         $cachekey = "feedback_{$assignid}_{$userid}";
         $cached   = $cache->get($cachekey);
 
@@ -273,7 +273,7 @@ abstract class element_base extends \mod_customcert\element {
         }
 
         if (!$this->assignment_is_available($assignid)) {
-            $result = get_string('feedbacknotavailable', 'customcertelement_assignfeedback');
+            $result = get_string('feedbacknotavailable', 'customcertelement_assignfeedbackcomments');
             $cache->set($cachekey, $result);
             return $result;
         }
@@ -292,13 +292,13 @@ abstract class element_base extends \mod_customcert\element {
         ]);
 
         if (!$row) {
-            $result = get_string('feedbacknotavailable', 'customcertelement_assignfeedback');
+            $result = get_string('feedbacknotavailable', 'customcertelement_assignfeedbackcomments');
             $cache->set($cachekey, $result);
             return $result;
         }
 
         if (empty($row->commenttext)) {
-            $result = get_string('nofeedbackprovided', 'customcertelement_assignfeedback');
+            $result = get_string('nofeedbackprovided', 'customcertelement_assignfeedbackcomments');
             $cache->set($cachekey, $result);
             return $result;
         }
@@ -319,7 +319,7 @@ abstract class element_base extends \mod_customcert\element {
                 if ($cm) {
                     global $CFG;
                     $url = $CFG->wwwroot . '/mod/assign/view.php?id=' . $cm->id;
-                    $readmore = get_string('readmoreonline', 'customcertelement_assignfeedback');
+                    $readmore = get_string('readmoreonline', 'customcertelement_assignfeedbackcomments');
                     $ending = '... <a href="' . $url . '">' . $readmore . '</a>';
                 }
             }

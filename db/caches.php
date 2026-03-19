@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * MUC (Moodle Universal Cache) definitions for customcertelement_assignfeedback.
+ * MUC (Moodle Universal Cache) definitions for customcertelement_assignfeedbackcomments.
  *
  * Defines the 'feedbackcache' request-scoped cache used by element::get_feedback_for_user()
  * to avoid redundant DB round-trips when the same feedback is rendered by multiple
@@ -28,7 +28,7 @@
  * - On high-traffic sites, this prevents duplicate JOIN queries when the same
  *   assignment feedback element appears more than once on a certificate template.
  *
- * @package customcertelement_assignfeedback
+ * @package customcertelement_assignfeedbackcomments
  * @copyright 2026 Joe Rebbeck <tjr@the-ela.com>
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

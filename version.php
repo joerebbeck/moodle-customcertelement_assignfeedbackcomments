@@ -17,18 +17,18 @@
 /**
  * Plugin version information.
  *
- * @package   customcertelement_assignfeedback
+ * @package   customcertelement_assignfeedbackcomments
  * @copyright 2026 Joe Rebbeck <tjr@the-ela.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'customcertelement_assignfeedback';
+$plugin->component = 'customcertelement_assignfeedbackcomments';
 $plugin->version   = 2026031900;
 $plugin->requires  = 2022112800; // Updated to Moodle 4.1+ per README
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '1.1.0';
+$plugin->release   = '1.0.0';
 
 // Declare explicit dependencies for robust installation checks
 $plugin->dependencies = [

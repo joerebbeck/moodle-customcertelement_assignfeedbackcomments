@@ -1,66 +1,64 @@
 # Assignment Feedback Comments — Custom Certificate Element
 
-A [mod_customcert](https://moodle.org/plugins/mod_customcert) element plugin that renders
-a student's assignment **feedback comment** text directly onto a generated PDF certificate.
+A Moodle [mod_customcert](https://moodle.org/plugins/mod_customcert) element plugin that renders a student's assignment **feedback comment** text directly onto a generated PDF certificate.
 
-## Requirements
+---
+
+## 🌟 Features
+
+*   **Rich Formatting preservation**: Preserves safe inline HTML tags (like bolding, italics, paragraphs, and list layouts) when rendering onto PDFs instead of bulk stripping.
+*   **Automatic Truncation Handling**: Includes a configurable character limit setting with automatic "Read more online" URL appended if threshold limits are exceeded.
+*   **Performance Cache Integrates**: Uses indexed fast-queries with local cache storage pipelines built natively into database configurations to boost layout loads.
+*   **Compatibility V2 ready**: Wired correctly out-of-the-box with conditionals supporting upcoming core `Element System v2` layout specifications node.
+
+---
+
+## 📋 Requirements
 
 | Dependency | Version |
 |---|---|
-| Moodle | 4.1 + |
-| mod_customcert | 4.1 + (Element System v2 supported from 5.2+) |
+| Moodle | 4.1+ |
+| mod_customcert | 4.1+ (supports Element System v2 for 5.2+) |
 | mod_assign | Must be installed and enabled |
 
-## What it does
+---
 
-When a certificate is generated the element looks up the grader's feedback comment for
-the configured assignment and renders it as formatted text in the certificate PDF.
+## ⚙️ Configuration & Usage
 
-The text is processed through Moodle's `format_text()` (filter pipeline, pluginfile
-URL resolution) and then sanitised for TCPDF compatibility before rendering.
+Once installed to your moodle build, the element will appear as **"Assignment Feedback Comments"** inside the template bundle items menu.
 
-## ⚠️ Feedback sub-plugin limitation
+Upon adding the element to a cert template:
+1.  **Assignment ID**: Choose the target assignment mapping from the dropdown directory.
+2.  **Character Limit**: *(Optional)* Enter the maximum allowed characters. Type `0` to display full feedback length boundaries.
 
-Moodle's assignment activity uses a **sub-plugin architecture** for feedback types.
-This element reads **only** from the _Feedback comments_ sub-plugin
-(`assignfeedback_comments`).
+## ⚠️ Limitations & Fallbacks
 
-| Feedback sub-plugin | Supported? |
+This element reads **only** from the *Feedback comments* sub-plugin (`assignfeedback_comments`).
+
+| Situation | Text Shown on Certificate |
 |---|---|
-| Feedback comments (`assignfeedback_comments`) | ✅ Yes |
-| Annotate PDF (`assignfeedback_editpdf`) | ❌ No |
-| File feedback (`assignfeedback_file`) | ❌ No |
-| Offline grading worksheet (`assignfeedback_offline`) | ❌ No |
+| Assignment deleted / uninstalled | _Feedback not available_ |
+| Grader has not graded user yet | _Feedback not available_ |
+| Graded but with NO comment filled | _No feedback provided_ |
+| HTML tags exceed threshold | Safely closes open tags during shorten pass |
 
-If a grader uses _Annotate PDF_ or _File feedback_ **without** also writing a feedback
-comment, the certificate will display _"No feedback provided"_.
+---
 
-**Before issuing certificates**, verify that _Feedback comments_ is enabled on the
-assignment: **Assignment › Edit settings › Feedback types**.
-
-## Placeholder strings
-
-| Situation | Text shown on certificate |
-|---|---|
-| mod_assign uninstalled, or assignment deleted | _Feedback not available_ |
-| Student has not been graded yet | _Feedback not available_ |
-| Student graded but no comment written | _No feedback provided_ |
-| Feedback comment present | Formatted comment text |
-
-## Installation
+## 🚀 Installation
 
 ### Method 1: Via Zip Upload (Recommended)
-1. Log in to your Moodle site as an administrator.
+1. Log in as an admin to your Moodle site.
 2. Go to **Site administration › Plugins › Install plugins**.
-3. Upload the `.zip` file for this plugin.
-4. Follow the prompts to trigger the upgrade set.
+3. Attach and upload the `assignfeedbackcomments.zip` file.
+4. Run standard DB checks to trigger deployment.
 
-### Method 2: Manual (Developer Workflow)
-1. Copy or clone this folder into your Moodle installation's customcert element directory.
-2. Visit **Site administration › Notifications** to trigger the installation script.
+### Method 2: Manual (Developer workflow)
+1. Extract or clone this folder into your Moodle build at:
+   `<moodleroot>/mod/customcert/element/assignfeedbackcomments/`
+2. Go to **Site administration › Notifications** to kick off script installs.
 
-Once installed, the item will appear as **"Assignment Feedback Comments"** in the certificate template editor's element menu.
+---
 
-## License
+## 📄 License
 
 GNU GPL v3 or later — see [LICENSE](LICENSE)

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2026-03-19
+## [1.0.0] - 2026-03-19
 ### Added
 - GitHub Actions Continuous Integration workflow running PHPUnit, Behat, PHPCS (Coding Style), and Linting against multiple PHP/Moodle/DB versions.
 - Unit test coverage (`test_get_feedback_for_user_truncates_over_limit`) specifically validating correct HTML-aware truncation thresholds and append link generators.

@@ -21,12 +21,12 @@
  * rendered on certificates is correctly included in "Export my data"
  * and "Delete my data" GDPR requests.
  *
- * @package customcertelement_assignfeedback
+ * @package customcertelement_assignfeedbackcomments
  * @copyright 2026 Joe Rebbeck <tjr@the-ela.com>
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace customcertelement_assignfeedback\privacy;
+namespace customcertelement_assignfeedbackcomments\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -204,7 +204,7 @@ class provider implements
 
             if (!empty($exportdata)) {
                 writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'customcertelement_assignfeedback')],
+                    [get_string('pluginname', 'customcertelement_assignfeedbackcomments')],
                     (object) ['feedback_entries' => $exportdata]
                 );
             }

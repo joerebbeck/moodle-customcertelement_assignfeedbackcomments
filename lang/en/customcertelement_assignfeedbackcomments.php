@@ -15,9 +15,9 @@
 // along with Moodle. If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Language strings for customcertelement_assignfeedback.
+ * Language strings for customcertelement_assignfeedbackcomments.
  *
- * @package customcertelement_assignfeedback
+ * @package customcertelement_assignfeedbackcomments
  * @copyright 2026 Joe Rebbeck <tjr@the-ela.com>
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

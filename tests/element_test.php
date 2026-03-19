@@ -17,19 +17,19 @@
 /**
  * PHPUnit tests for the assignfeedback customcert element.
  *
- * @package   customcertelement_assignfeedback
+ * @package   customcertelement_assignfeedbackcomments
  * @copyright 2026 Joe Rebbeck <tjr@the-ela.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace customcertelement_assignfeedback;
+namespace customcertelement_assignfeedbackcomments;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Unit tests for the assignfeedback element.
  *
- * @covers \customcertelement_assignfeedback\element
+ * @covers \customcertelement_assignfeedbackcomments\element
  */
 class element_test extends \advanced_testcase {
 
@@ -98,7 +98,7 @@ class element_test extends \advanced_testcase {
         $method->setAccessible(true);
 
         $result = $method->invoke($element, $assign->id, $student->id);
-        $this->assertEquals(get_string('nofeedbackprovided', 'customcertelement_assignfeedback'), $result);
+        $this->assertEquals(get_string('nofeedbackprovided', 'customcertelement_assignfeedbackcomments'), $result);
     }
 
     /**
@@ -116,7 +116,7 @@ class element_test extends \advanced_testcase {
         $method->setAccessible(true);
 
         $result = $method->invoke($element, $assign->id, $student->id);
-        $this->assertEquals(get_string('feedbacknotavailable', 'customcertelement_assignfeedback'), $result);
+        $this->assertEquals(get_string('feedbacknotavailable', 'customcertelement_assignfeedbackcomments'), $result);
     }
 
     /**
@@ -260,12 +260,12 @@ class element_test extends \advanced_testcase {
     /**
      * Helper: invoke the protected clean_for_pdf() method via reflection.
      *
-     * @param \customcertelement_assignfeedback\element $element
+     * @param \customcertelement_assignfeedbackcomments\element $element
      * @param string $html
      * @return string
      */
     private function call_clean_for_pdf(
-        \customcertelement_assignfeedback\element $element,
+        \customcertelement_assignfeedbackcomments\element $element,
         string $html
     ): string {
         $ref    = new \ReflectionMethod($element, 'clean_for_pdf');
@@ -276,9 +276,9 @@ class element_test extends \advanced_testcase {
     /**
      * Helper: get a test element instance.
      *
-     * @return \customcertelement_assignfeedback\element
+     * @return \customcertelement_assignfeedbackcomments\element
      */
-    private function get_test_element(): \customcertelement_assignfeedback\element {
+    private function get_test_element(): \customcertelement_assignfeedbackcomments\element {
         return new element(new \stdClass());
     }
 }
