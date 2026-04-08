@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-04-08
+### Fixed
+- Removed string concatenation from `feedbackcommentsonly` lang string to comply with Moodle language file standards (joerebbeck/moodle-customcertelement_assignfeedbackcomments#1).
+- Added missing `cachedef_feedbackcache` language string required for the named cache defined in `db/caches.php` (joerebbeck/moodle-customcertelement_assignfeedbackcomments#2).
+
 ## [1.0.0] - 2026-03-19
 ### Added
 - GitHub Actions Continuous Integration workflow running PHPUnit, Behat, PHPCS (Coding Style), and Linting against multiple PHP/Moodle/DB versions.

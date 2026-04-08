@@ -36,13 +36,7 @@ $string['chooseassignment']  = 'Choose an assignment...';
 // Explains to instructors that only feedback entered via the "Feedback comments"
 // sub-plugin will appear on the certificate — so they can verify their assignment
 // has that sub-plugin enabled before issuing certificates.
-$string['feedbackcommentsonly'] = '<div class="alert alert-info mt-2 mb-0">'
-    . '<strong>Note:</strong> This element only displays text entered via the '
-    . '<em>Feedback comments</em> sub-plugin. Feedback from <em>Annotate PDF</em>, '
-    . '<em>File feedback</em>, or other sub-plugins will <strong>not</strong> appear '
-    . 'on the certificate. Verify that <em>Feedback comments</em> is enabled on the '
-    . 'chosen assignment (Assignment &rsaquo; Edit settings &rsaquo; Feedback types).'
-    . '</div>';
+$string['feedbackcommentsonly'] = '<div class="alert alert-info mt-2 mb-0"><strong>Note:</strong> This element only displays text entered via the <em>Feedback comments</em> sub-plugin. Feedback from <em>Annotate PDF</em>, <em>File feedback</em>, or other sub-plugins will <strong>not</strong> appear on the certificate. Verify that <em>Feedback comments</em> is enabled on the chosen assignment (Assignment &rsaquo; Edit settings &rsaquo; Feedback types).</div>';
 
 // Feedback placeholder strings.
 // Shown on the certificate when feedback cannot be rendered.
@@ -60,6 +54,9 @@ $string['charlimit_help'] = 'Enter the maximum number of characters (including s
 $string['assignid'] = 'Assignment';
 $string['assignid_help'] = 'Select the assignment from which to retrieve feedback comments.';
 $string['readmoreonline'] = 'Read more online';
+
+// Cache definition string (required for every named cache in db/caches.php).
+$string['cachedef_feedbackcache'] = 'Assignment feedback comments cache';
 
 // Privacy API strings.
 $string['privacy:metadata:assign_grades']
